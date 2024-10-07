@@ -1,5 +1,6 @@
 import React from 'react'
 import {BackgroundBeams} from "@/components/ui/background-beams";
+import InputForm from "@/components/InputForm";
 
 const HomePage = () => {
     return (
@@ -18,6 +19,7 @@ const HomePage = () => {
                         Instantly Summarize any Video With Ease
                     </p>
                 </div>
+                <InputForm/>
             </div>
         </div>
     )

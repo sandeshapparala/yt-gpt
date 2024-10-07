@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -30,7 +33,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark bg-slate-900` }
       >
         <Navbar/>
-        <div className={"pt-[70px]"}>
+        <div className={""}>
         {children}
         </div>
       </body>
