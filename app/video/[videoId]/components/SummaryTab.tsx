@@ -27,14 +27,14 @@ const SummaryTab = ({ videoId }: { videoId: string }) => {
         fetchSummary();
     }, [videoId]);
 
-    if (loading) return <div>Loading summary...</div>;
+    if (loading) return <div >Loading summary...</div>;
     if (error) return <div>{error}</div>;
 
     return (
         <div className="p-4">
             {/* Render the summary with markdown support if necessary */}
 
-            <div className="prose max-w-none">
+            <div className="prose max-w-none text-black">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
             </div>
         </div>

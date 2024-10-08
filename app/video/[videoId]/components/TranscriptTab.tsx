@@ -39,7 +39,7 @@ const TranscriptTab: React.FC<TranscriptProps> = ({ videoId }) => {
 
     return (
         <div className="p-4">
-            <pre className="whitespace-pre-wrap">{transcript}</pre>
+            <pre className="whitespace-pre-wrap text-black">{transcript}</pre>
         </div>
     );
 };

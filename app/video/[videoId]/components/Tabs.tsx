@@ -12,8 +12,8 @@ import SummaryTab from './SummaryTab';
 
 const VideoTabs = ({ videoId }: { videoId: string }) => {
     return (
-        <Tabs defaultValue="transcript" className="w-full">
-            <TabsList>
+        <Tabs defaultValue="transcript" className="w-full text-black">
+            <TabsList className={"bg-gray-800 rounded-t-lg h-12 px-5 w-full sticky top-0"}>
                 <TabsTrigger value="transcript">Transcript</TabsTrigger>
                 <TabsTrigger value="summary">Summary</TabsTrigger>
                 <TabsTrigger value="mindmap">Mindmap</TabsTrigger>

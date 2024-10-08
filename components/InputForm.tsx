@@ -28,15 +28,15 @@ const InputForm = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-center border-2 border-dashed border-gray-500 p-4 rounded-lg bg-gray-800 w-full max-w-6xl mx-auto mt-6">
+        <form onSubmit={handleSubmit} className="flex items-center border-[1px] border-solid border-gray-500 p-4 rounded-xl bg-transparent w-full max-w-6xl mx-auto mt-6">
             <input
                 type="text"
                 placeholder="Enter YouTube URL"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="flex-grow p-3 text-black rounded-l-lg outline-none w-full "
+                className="flex-grow p-3 text-white rounded-l-xl outline-none w-full bg-gray-700"
             />
-            <button type="submit" className={"bg-blue-500 text-white px-6 py-3 rounded-r-lg hover:bg-blue-600 active:bg-blue-700 transition-all duration-300 ease-in-out"}>Summarise</button>
+            <button type="submit" className={"bg-blue-500 text-white px-6 py-3 rounded-r-xl hover:bg-blue-600 active:bg-blue-700 transition-all duration-300 ease-in-out"}>Summarise</button>
         </form>
     );
 };

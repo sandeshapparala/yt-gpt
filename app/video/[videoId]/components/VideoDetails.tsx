@@ -19,8 +19,8 @@ const VideoDetails = ({ videoId }: { videoId: string }) => {
 
     return (
         <div className="mt-4">
-            <h1 className="text-2xl font-bold">{videoDetails.title}</h1>
-            <p className="text-gray-400">{videoDetails.channel}</p>
+            <h1 className="text-xl font-bold text-black pb-3">{videoDetails.title}</h1>
+            <p className="text-gray-700 ">Channel: {videoDetails.channel}</p>
 
 
 
