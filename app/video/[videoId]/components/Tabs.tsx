@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import TranscriptTab from './TranscriptTab';
-// import SummaryTab from './SummaryTab';
+import SummaryTab from './SummaryTab';
 // import MindmapTab from './MindmapTab';
 // import ChatTab from './ChatTab';
 
@@ -24,7 +24,7 @@ const VideoTabs = ({ videoId }: { videoId: string }) => {
                 <TranscriptTab videoId={videoId} />
             </TabsContent>
             <TabsContent value="summary">
-                {/*<SummaryTab videoId={videoId} />*/}
+                <SummaryTab videoId={videoId} />
             </TabsContent>
             <TabsContent value="mindmap">
                 {/*<MindmapTab videoId={videoId} />*/}

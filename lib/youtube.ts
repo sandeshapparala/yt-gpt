@@ -15,14 +15,13 @@ export const getVideoDetails = async (videoId: string) => {
             `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${YOUTUBE_API_KEY}`
         );
         const item = response.data.items[0];
-        console.log(item);
+
         return {
             title: item.snippet.title,
             channel: item.snippet.channelTitle,
 
         };
     } catch (error) {
-        console.error('Error fetching video details:', error);
         throw new Error('Failed to fetch video details');
     }
 };

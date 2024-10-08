@@ -21,7 +21,6 @@ const TranscriptTab: React.FC<TranscriptProps> = ({ videoId }) => {
                 setTranscript(response.data.transcript);
             } catch (err) {
                 setError('Failed to load transcript.');
-                console.error(err);
             } finally {
                 setLoading(false);
             }
