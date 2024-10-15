@@ -6,8 +6,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import TranscriptTab from './TranscriptTab';
 import SummaryTab from './SummaryTab';
-// import MindmapTab from './MindmapTab';
-// import ChatTab from './ChatTab';
 
 const VideoTabs = ({ videoId }: { videoId: string }) => {
     return (
