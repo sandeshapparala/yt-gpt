@@ -8,6 +8,7 @@ export const getTranscript = async (videoId: string): Promise<string> => {
         const transcript = transcriptItems.map(item => item.text).join(' ');
         return transcript;
     } catch (error) {
+        console.error('Failed to fetch transcript:', error);
         throw new Error('Failed to fetch transcript');
     }
 };
