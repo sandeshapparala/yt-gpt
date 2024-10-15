@@ -4,8 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Loader from '../../../components/Loader';
-import '../../../styles/loader.css';
+import Loader from "@/components/Loader";
 
 const SummaryTab = ({ videoId }: { videoId: string }) => {
   const [summary, setSummary] = useState<string>('');
