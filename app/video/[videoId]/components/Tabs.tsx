@@ -1,7 +1,6 @@
 // app/video/[videoId]/components/Tabs.tsx
 'use client';
 
-import { useState } from 'react';
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -20,7 +19,7 @@ const VideoTabs = ({ videoId }: { videoId: string }) => {
                 <TabsTrigger value="chat">Chat with AI</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="transcript">
+            <TabsContent value="transcript" className={"flex justify-center items-center"}>
                 <TranscriptTab videoId={videoId} />
             </TabsContent>
             <TabsContent value="summary">

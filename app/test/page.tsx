@@ -1,34 +1,58 @@
-'use client'
+// app/video/[videoId]/components/SummaryTab.tsx
+'use client';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Loader from '../../../components/Loader';
+import '../../../styles/loader.css';
 
-import React, { useState, useEffect } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+const SummaryTab = ({ videoId }: { videoId: string }) => {
+  const [summary, setSummary] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+  const [loadingMessage, setLoadingMessage] = useState<string>('Reading transcript...');
 
-const Page = () => {
-    const [result, setResult] = useState<string>('');
+  useEffect(() => {
+    async function fetchSummary() {
+      try {
+        setLoading(true);
+        const response = await axios.post('/api/summary', { videoId });
+        setSummary(response.data.summary);
+      } catch (err) {
+        console.error('Error fetching summary:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSummary();
+  }, [videoId]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const API = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-                const genAI = new GoogleGenerativeAI(API);
-                const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  useEffect(() => {
+    const messages = [
+      'Reading transcript...',
+      'Generating summary...',
+      'Crafting highlights...',
+    ];
+    let index = 0;
+    const interval = setInterval(() => {
+      setLoadingMessage(messages[index]);
+      index = (index + 1) % messages.length;
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-                const prompt = 'Write a story about a magic backpack.';
-                const response = await model.generateContent(prompt);
+  if (loading) return <Loader message={loadingMessage} />;
+  if (error) return <div>{error}</div>;
 
-                const text = await response.response.text();
-                setResult(text);
-            } catch (error) {
-                console.error('Error generating content:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    return (
-        <div>{result}</div>
-    );
+  return (
+    <div className="p-4">
+      <div className="prose max-w-none text-black">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
+      </div>
+    </div>
+  );
 };
 
-export default Page;
+export default SummaryTab;

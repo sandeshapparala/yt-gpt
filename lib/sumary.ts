@@ -1,12 +1,12 @@
 // lib/summary.ts
 import { TextServiceClient } from '@google-ai/generativelanguage';
-import { protos } from '@google-ai/generativelanguage';
 import { GoogleAuth } from 'google-auth-library';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 
 export const generateSummary = async (transcript: string): Promise<string> => {
     try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const client = new TextServiceClient({
             authClient: new GoogleAuth().fromAPIKey(process.env.NEXT_PUBLIC_GEMINI_API_KEY as string),
         });

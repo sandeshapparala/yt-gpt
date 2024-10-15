@@ -1,7 +1,6 @@
 // app/video/[videoId]/page.tsx
 import VideoPlayer from './components/VideoPlayer';
 import VideoDetails from './components/VideoDetails';
-import VideoTabs from './components/Tabs';
 import React from "react";
 import InputForm from "@/components/InputForm";
 import {BackgroundBeams} from "@/components/ui/background-beams";
