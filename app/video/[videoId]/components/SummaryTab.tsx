@@ -20,7 +20,7 @@ const SummaryTab = ({ videoId }: { videoId: string }) => {
         setSummary(response.data.summary);
       } catch (err) {
         console.error('Error fetching summary:', err);
-        // @ts-expect-error
+        // @ts-expect-error - error is a string
         setError(err.message);
       } finally {
         setLoading(false);

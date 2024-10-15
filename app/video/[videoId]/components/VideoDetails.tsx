@@ -4,8 +4,14 @@
 import { useEffect, useState } from 'react';
 import { getVideoDetails } from '@/lib/youtube';
 
+interface VideoDetails {
+    title: string;
+    channel: string;
+    // Add other properties as needed
+}
+
 const VideoDetails = ({ videoId }: { videoId: string }) => {
-    const [videoDetails, setVideoDetails] = useState<any>(null);
+    const [videoDetails, setVideoDetails] = useState<VideoDetails | null>(null);
 
     useEffect(() => {
         async function fetchDetails() {
