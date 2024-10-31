@@ -1,47 +1,42 @@
-// app/video/[videoId]/components/TranscriptTab.tsx
 'use client';
-
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import axios from 'axios';
+import Loader from "@/components/Loader";
 
-interface TranscriptProps {
-    videoId: string;
-}
+const TranscriptTab = ({ videoId, transcript, setTranscript, loading, setLoading, error, setError }:
+    { videoId: string, transcript: string, setTranscript: (transcript: string) => void, loading: boolean, setLoading: (loading: boolean) => void, error: string, setError: (error: string) => void }) => {
 
-const TranscriptTab: React.FC<TranscriptProps> = ({ videoId }) => {
-    const [transcript, setTranscript] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>('');
-
-    useEffect(() => {
-        const fetchTranscript = async () => {
-            try {
-                setLoading(true);
-                const response = await axios.post('/api/transcript', { videoId });
-                setTranscript(response.data.transcript);
-            } catch (err) {
-                setError('Failed to load transcript.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTranscript();
-    }, [videoId]);
-
-    if (loading) {
-        return <div>Loading transcript...</div>;
+  useEffect(() => {
+    async function fetchTranscript() {
+      if (transcript) return; // If transcript is already fetched, do not fetch again
+      try {
+        setLoading(true);
+        const response = await axios.post('/api/transcript', { videoId });
+        setTranscript(response.data.transcript);
+      } catch (err) {
+        console.error('Error fetching transcript:', err);
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
     }
+    fetchTranscript();
+  }, [videoId, transcript, setTranscript, setLoading, setError]);
 
-    if (error) {
-        return <div className="text-red-500">{error}</div>;
-    }
+  if (loading) return (
+    <div className="flex items-center justify-center h-full">
+      <Loader message="Loading transcript..." />
+    </div>
+  );
+  if (error) return <div>{error}</div>;
 
-    return (
-        <div className="p-4">
-            <pre className="whitespace-pre-wrap text-black">{transcript}</pre>
-        </div>
-    );
+  return (
+    <div className="p-4">
+      <div className="prose max-w-none text-black">
+        {transcript}
+      </div>
+    </div>
+  );
 };
 
 export default TranscriptTab;

@@ -1,4 +1,3 @@
-// app/video/[videoId]/components/SummaryTab.tsx
 'use client';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -6,28 +5,27 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Loader from "@/components/Loader";
 
-const SummaryTab = ({ videoId }: { videoId: string }) => {
-  const [summary, setSummary] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
-  const [loadingMessage, setLoadingMessage] = useState<string>('Reading transcript...');
+const SummaryTab = ({ videoId, summary, setSummary, loading, setLoading, error, setError }:
+    { videoId: string, summary: string, setSummary: (summary: string) => void, loading: boolean, setLoading: (loading: boolean) => void, error: string, setError: (error: string) => void }) => {
+
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
 
   useEffect(() => {
     async function fetchSummary() {
+      if (summary) return; // If summary is already fetched, do not fetch again
       try {
         setLoading(true);
         const response = await axios.post('/api/summary', { videoId });
         setSummary(response.data.summary);
       } catch (err) {
         console.error('Error fetching summary:', err);
-        // @ts-expect-error - error is a string
-        setError(err.message);
+        setError((err as Error).message);
       } finally {
         setLoading(false);
       }
     }
     fetchSummary();
-  }, [videoId]);
+  }, [videoId, summary, setSummary, setLoading, setError]);
 
   useEffect(() => {
     const messages = [
@@ -43,11 +41,11 @@ const SummaryTab = ({ videoId }: { videoId: string }) => {
     return () => clearInterval(interval);
   }, []);
 
-    if (loading) return (
-        <div className="flex items-center justify-center h-full">
-            <Loader message={loadingMessage} />
-        </div>
-    );
+  if (loading) return (
+    <div className="flex items-center justify-center h-full">
+      <Loader message={loadingMessage} />
+    </div>
+  );
   if (error) return <div>{error}</div>;
 
   return (
