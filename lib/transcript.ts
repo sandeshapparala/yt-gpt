@@ -3,12 +3,19 @@ import { YoutubeTranscript } from 'youtube-transcript';
 
 export const getTranscript = async (videoId: string): Promise<string> => {
     try {
-        const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
-        // Concatenate the transcript texts
+        const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId, {
+            lang: 'en',
+            country: 'US'
+        });
+
+        if (!transcriptItems || transcriptItems.length === 0) {
+            throw new Error('No transcript available for this video');
+        }
+
         const transcript = transcriptItems.map(item => item.text).join(' ');
         return transcript;
     } catch (error) {
-        console.error('Failed to fetch transcript:', error);
-        throw new Error('Failed to fetch transcript');
+        console.error('Transcript error details:', error);
+        throw new Error(error instanceof Error ? error.message : 'Failed to fetch transcript');
     }
 };
