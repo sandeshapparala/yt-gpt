@@ -1,87 +1,112 @@
+// components/register/RegisterForm.tsx
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /* eslint-disable */
 
-// lib/transcript.ts
 import { YoutubeTranscript } from 'youtube-transcript';
 import axios from 'axios';
 
-// Additional methods to fetch YouTube transcripts
+// Client-side YouTube transcript fetching
 export const getTranscript = async (videoId: string): Promise<string> => {
     try {
-        // Add retries and timeout
         const maxRetries = 3;
         let lastError;
 
         for (let i = 0; i < maxRetries; i++) {
             try {
-                // Method 1: Try our proxy API first in production
-                if (typeof window !== 'undefined') { // Check if we're in the browser
-                    try {
-                        // Use our proxy-transcript API
-                        const response = await axios.get(`/api/proxy-transcript?videoId=${videoId}`, {
-                            timeout: 15000
-                        });
-                        if (response.data && response.data.transcript) {
-                            return response.data.transcript;
-                        }
-                    } catch (proxyErr) {
-                        console.log('Proxy API failed, falling back to other methods', proxyErr);
+                // Use a CORS proxy for YouTube requests
+                const corsProxy = 'https://corsproxy.io/?';
+                
+                // Method 1: Try YoutubeTranscript library with CORS proxy
+                try {
+                    const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId, {
+                        corsProxy // Set CORS proxy for the library
+                    });
+                    
+                    if (transcriptItems && transcriptItems.length > 0) {
+                        return transcriptItems
+                            .map(item => item.text)
+                            .join(' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
                     }
-
-                    // Method 2: Try using free online services that provide YouTube transcripts
-                    try {
-                        const services = [
-                            `https://youtubetranscript.com/?server_vid=${videoId}`,
-                            `https://www.captionsgrabber.com/caption-api.php?id=${videoId}`,
-                            `https://downsub.com/api/transcript?url=https://www.youtube.com/watch?v=${videoId}`
-                        ];
-
-                        for (const service of services) {
-                            try {
-                                const response = await axios.get(service, { timeout: 10000 });
-                                // Each service returns data in different formats, we need to handle them
-                                if (response.data) {
-                                    // Processing depends on the service response format
-                                    // This is a simplified check
-                                    if (typeof response.data === 'string' && response.data.includes('transcript-text')) {
-                                        const match = response.data.match(/<div id="transcript-text">(.*?)<\/div>/s);
-                                        if (match && match[1]) {
-                                            return match[1].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                                        }
-                                    } else if (response.data.transcript || response.data.text) {
-                                        return response.data.transcript || response.data.text;
+                } catch (err) {
+                    console.log('YoutubeTranscript library failed:', err.message);
+                }
+                
+                // Method 2: Try CORS-friendly transcript sources
+                try {
+                    // Use a CORS proxy with these services
+                    const services = [
+                        `${corsProxy}https://youtubetranscript.com/?server_vid=${videoId}`,
+                        `${corsProxy}https://downsub.com/api/transcript?url=https://www.youtube.com/watch?v=${videoId}`
+                    ];
+                    
+                    for (const service of services) {
+                        try {
+                            const response = await axios.get(service, { timeout: 10000 });
+                            if (response.data) {
+                                // Process based on service format
+                                if (typeof response.data === 'string' && response.data.includes('transcript-text')) {
+                                    const match = response.data.match(/<div id="transcript-text">(.*?)<\/div>/s);
+                                    if (match && match[1]) {
+                                        return match[1].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
                                     }
+                                } else if (response.data.transcript || response.data.text) {
+                                    return response.data.transcript || response.data.text;
                                 }
-                            } catch (e) {
-                                console.log(`Service ${service} failed:`, e.message);
+                            }
+                        } catch (e) {
+                            console.log(`Service ${service} failed:`, e.message);
+                        }
+                    }
+                } catch (serviceErr) {
+                    console.log('All transcript services failed', serviceErr);
+                }
+
+                // Method 3: Try a simpler approach with just the YouTube page
+                try {
+                    const ytPageUrl = `${corsProxy}https://www.youtube.com/watch?v=${videoId}`;
+                    const response = await axios.get(ytPageUrl, { timeout: 10000 });
+                    
+                    if (response.data) {
+                        // Look for caption tracks in YouTube page
+                        const captionRegex = /"captionTracks":\s*(\[.*?\])/;
+                        const match = response.data.match(captionRegex);
+                        
+                        if (match && match[1]) {
+                            const captionTracks = JSON.parse(match[1]);
+                            if (captionTracks.length > 0) {
+                                // Get the first caption track URL
+                                const captionUrl = captionTracks[0].baseUrl;
+                                // Fetch the caption track
+                                const captionResponse = await axios.get(`${corsProxy}${captionUrl}`, { timeout: 10000 });
+                                // Parse the XML response
+                                if (captionResponse.data) {
+                                    // Simple XML parsing to extract text
+                                    const textRegex = /<text[^>]*>(.*?)<\/text>/g;
+                                    let transcript = '';
+                                    let textMatch;
+                                    
+                                    while ((textMatch = textRegex.exec(captionResponse.data)) !== null) {
+                                        transcript += ' ' + textMatch[1];
+                                    }
+                                    
+                                    return transcript.replace(/&amp;/g, '&')
+                                                    .replace(/&lt;/g, '<')
+                                                    .replace(/&gt;/g, '>')
+                                                    .replace(/\s+/g, ' ')
+                                                    .trim();
+                                }
                             }
                         }
-                    } catch (serviceErr) {
-                        console.log('All transcript services failed', serviceErr);
                     }
+                } catch (ytError) {
+                    console.log('YouTube page method failed:', ytError.message);
                 }
-
-                // Method 3: Direct library method as last resort
-                const transcriptItems = await Promise.race([
-                    YoutubeTranscript.fetchTranscript(videoId),
-                    new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('Timeout')), 10000)
-                    )
-                ]);
-
-                if (!transcriptItems || transcriptItems.length === 0) {
-                    throw new Error('No transcript available');
-                }
-
-                // Concatenate the transcript texts with proper spacing
-                const transcript = transcriptItems
-                    .map(item => item.text)
-                    .join(' ')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-
-                return transcript;
+                
+                throw new Error('Could not retrieve transcript with any method');
+                
             } catch (err) {
                 lastError = err;
                 console.log(`Attempt ${i + 1} failed:`, err.message);
